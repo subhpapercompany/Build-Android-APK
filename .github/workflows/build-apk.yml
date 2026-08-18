@@ -13,15 +13,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Pull Buildozer Docker image
-        run: docker pull ghcr.io/kivy/buildozer:1.2.0
+        run: docker pull ghcr.io/kivy/buildozer:latest
 
       - name: Build APK
         run: |
           mkdir -p "$HOME/.buildozer"
+
           docker run --rm \
-            -v "$GITHUB_WORKSPACE":/home/user/hostcwd \
-            -v "$HOME/.buildozer":/home/user/.buildozer \
-            ghcr.io/kivy/buildozer:1.2.0 \
+            -v "$GITHUB_WORKSPACE:/home/user/hostcwd" \
+            -v "$HOME/.buildozer:/home/user/.buildozer" \
+            ghcr.io/kivy/buildozer:latest \
             android debug
 
       - name: Find APK
