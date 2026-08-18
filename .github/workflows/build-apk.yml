@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-android:
+  build:
     name: Build Factory Leave APK
     runs-on: ubuntu-latest
 
@@ -12,12 +12,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build APK with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          workdir: .
-          buildozer_version: stable
+      - name: Pull Buildozer Docker image
+        run: docker pull ghcr.io/kivy/buildozer:latest
+
+      - name: Build APK
+        run: |
+          mkdir -p "$HOME/.buildozer"
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE":/home/user/hostcwd \
+            -v "$HOME/.buildozer":/home/user/.buildozer \
+            ghcr.io/kivy/buildozer:latest \
+            android debug
+
+      - name: Find APK
+        run: |
+          echo "APK files:"
+          find bin -type f -name "*.apk" -print
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
